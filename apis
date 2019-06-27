@@ -255,20 +255,29 @@ def reserve():
 		return Response('duration exceeds reservation time', status=400)
     if verify_apikey(user_id, user_apikey):
 	if gid != None:		
-	    flag = 0
+	    flag1 = 0
+	    flag2 = 0
 	    sql_select_query = """select device_list from groups where uid = %s and gid = %s"""
     	    cur.execute(sql_select_query, (user_id,gid))
     	    device_list = cur.fetchone()
     	    if device_list != None:
 	        query = """select * from reservations as r, device_state as s where r.rst >= %s and r.ret <= %s and r.rid = s.rid"""		    
 	        cur.execute(query, (reservation_start_time, reservation_end_time))
-    	        records = cur.fetchall()
-	        if records != None:
-		    for record in records:
+    	        records1 = cur.fetchall()
+	        if records1 != None:
+		    for record in records1:
 			active_device_list = [device for device in device_list if device in record[9]]
 		        if active_device_list != []:	 
-			    flag = 1
-	        if flag == 0:
+			    flag1 = 1
+		query = """select * from reservations as r, device_state as s where r.rst <= %s and r.ret >= %s and r.rid = s.rid"""		    
+	        cur.execute(query, (reservation_start_time, reservation_end_time))
+    	        records2 = cur.fetchall()
+	        if records2 != None:
+		    for record in records2:
+			active_device_list = [device for device in device_list if device in record[9]]
+		        if active_device_list != []:	 
+			    flag2 = 1
+	        if (flag1 == 0) & (flag2 ==0):
 		    rid = "".join([random.choice(string.ascii_lowercase + string.digits) for i in range(32)])
 		    priority = setpriority()
 		    cur.execute("""INSERT INTO reservations (rid,rst,ret,st,et,frequency,duration,state) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",(rid,reservation_start_time,reservation_end_time,start_time,end_time,frequency,duration_seconds,'inactive'))
@@ -372,14 +381,21 @@ def upreserve(rid):
 		else:
 		    duration_seconds = record[7]
 		    end_time = record[4]
-       	        flag = 0
+       	        flag1 = 0
 	        query = """select device_list from reservations as r, device_state as s where r.rst >= %s and r.ret <= %s and r.rid = s.rid and r.rid != %s"""		    
 	        cur.execute(query, (reservation_start_time,reservation_end_time,rid))
     	        device_list = cur.fetchall()
 	        if device_list != []:
 		    if (device for device in device_list if device in reservation_info[5]) != None:	 	 
-			flag = 1
-	        if flag == 0:
+			flag1 = 1
+		flag2 = 0
+	        query = """select device_list from reservations as r, device_state as s where r.rst <= %s and r.ret >= %s and r.rid = s.rid and r.rid != %s"""		    
+	        cur.execute(query, (reservation_start_time,reservation_end_time,rid))
+    	        device_list = cur.fetchall()
+	        if device_list != []:
+		    if (device for device in device_list if device in reservation_info[5]) != None:	 	 
+			flag2 = 1
+	        if (flag1 == 0) & (flag2 == 0):
 		    reservation_time = reservation_end_time - reservation_start_time
 		    time_now = datetime.now()
     		    now_seconds = time.mktime(time_now.timetuple())
