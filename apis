@@ -1128,7 +1128,7 @@ def opchannel():
 		flag = False
 		for row in records:
 	            lst3 = [value for value in reservation_info[13] if value in row[1]] 
-		    if lst3 != None:
+		    if lst3 != []:
 			flag = True
     	        if flag == False:	
 		    cid = "".join([random.choice(string.ascii_lowercase + string.digits) for i in range(32)])
@@ -1323,6 +1323,12 @@ def opfunc():
 	    query = """select * from device_state as s, reservations as r, reservations_info as i where i.rid != %s and r.rid = i.rid and i.rid = s.rid and r.state = %s and i.priority < 3"""
             cur.execute(query, (record[0],'active'))
     	    reservation_info = cur.fetchall()
+	    flag = False
+		for device_list in record[1]:
+	            lst3 = [value for value in reservation_info[13] if value in row[1]] 
+		    if lst3 != []:
+			flag = True
+    	        if flag == False:	
             flag = 0
 	    for device_list in record[1]:
 		for row in reservation_info:
