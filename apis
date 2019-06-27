@@ -1125,12 +1125,12 @@ def opchannel():
 		query = """select * from device_state as s, reservations as r, reservations_info as i where i.uid = %s  and i.rid != %s and r.rid = i.rid and i.rid = s.rid and r.state = %s and i.priority < 3"""
                 cur.execute(query, (user_id,rid,'active'))
     	        records = cur.fetchall()
-		flag = 0
-		for device_list in reservation_info[13]:
-		    for row in records:
-			if(all(device in device_list for device in row[1])):
-			        flag = 1
-		if flag == 0 :    
+		flag = False
+		for row in records:
+	            lst3 = [value for value in reservation_info[13] if value in row[1]] 
+		    if lst3 != None:
+			flag = True
+    	        if flag == False:	
 		    cid = "".join([random.choice(string.ascii_lowercase + string.digits) for i in range(32)])
 		    query = """UPDATE reservations_info set cid = %s where rid = %s"""
     		    cur.execute(query, (cid,rid))
