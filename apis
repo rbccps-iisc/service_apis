@@ -1324,17 +1324,11 @@ def opfunc():
             cur.execute(query, (record[0],'active'))
     	    reservation_info = cur.fetchall()
 	    flag = False
-		for device_list in record[1]:
-	            lst3 = [value for value in reservation_info[13] if value in row[1]] 
-		    if lst3 != []:
-			flag = True
-    	        if flag == False:	
-            flag = 0
-	    for device_list in record[1]:
-		for row in reservation_info:
-		    if(all(device in device_list for device in row[1])):
-			f = 1
-	    if flag == 0 :    
+	    for row in records:
+	        lst3 = [value for value in record[1] if value in row[1]] 
+		if lst3 != []:
+		    flag = True
+    	    if flag == False:	
 	        query = """UPDATE reservations set state = %s where rid = %s"""
     		cur.execute(query, ('active',record[0]))
                 connection.commit()
