@@ -1348,6 +1348,13 @@ def opfunc():
 	        query = """UPDATE reservations set state = %s where rid = %s"""
     		cur.execute(query, ('active',record[0]))
                 connection.commit()
+		query = """select * from configure where rid = %s and type = %s"""
+            	cur.execute(query, (record[0],'sync'))
+    	    	configure_info = cur.fetchone()
+		if configure_info != None:
+		    query = """UPDATE configure set type = %s where rid = %s"""
+    		    cur.execute(query, ('sync',record[0]))
+                    connection.commit()
 	    else:
 		return Response('high priority task executing', status=409)
     else:
