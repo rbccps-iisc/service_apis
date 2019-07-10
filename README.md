@@ -10,3 +10,4 @@ reservations_info - It contains reservation information.
 device_state - It contains information about devices in a reservation. 
 configure - It contains the device configurations.  
 write_op - It contains the device content. 
+The APIs are used by users to sign up, create groups of devices and reserve those groups. After obtaining a reservation-id the user can configure the devices and write content to the devices. These APIs are a reference implementation of the write APIs. 
